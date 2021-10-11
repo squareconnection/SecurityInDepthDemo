@@ -84,6 +84,7 @@ namespace SecurityInDepthDemo.Controllers
             string account = _configuration.GetValue<string>("CosmosDb:SimpleAccount");
 
             Microsoft.Azure.Cosmos.CosmosClient client = new Microsoft.Azure.Cosmos.CosmosClient(account, new DefaultAzureCredential());
+            
             CosmosDbService cosmosDbService = new CosmosDbService(client, databaseName, containerName);
             Microsoft.Azure.Cosmos.DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
             await database.Database.CreateContainerIfNotExistsAsync(containerName, "/id");
