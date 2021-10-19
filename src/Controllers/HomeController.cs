@@ -43,6 +43,8 @@ namespace SecurityInDepthDemo.Controllers
             
             string account = _configuration.GetValue<string>("CosmosDb:SimpleAccount");
             string key = _configuration.GetValue<string>("CosmosDb:SimpleKey");
+
+
             Microsoft.Azure.Cosmos.CosmosClient client = new Microsoft.Azure.Cosmos.CosmosClient(account, key);
             CosmosDbService cosmosDbService = new CosmosDbService(client, databaseName, containerName);
             Microsoft.Azure.Cosmos.DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
@@ -55,6 +57,8 @@ namespace SecurityInDepthDemo.Controllers
 
             string account = _configuration.GetValue<string>("CosmosDb:NetworkProtectedAccount");
             string key = _configuration.GetValue<string>("CosmosDb:NetworkProtectedKey");
+
+
             Microsoft.Azure.Cosmos.CosmosClient client = new Microsoft.Azure.Cosmos.CosmosClient(account, key);
             CosmosDbService cosmosDbService = new CosmosDbService(client, databaseName, containerName);
             Microsoft.Azure.Cosmos.DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
@@ -68,7 +72,11 @@ namespace SecurityInDepthDemo.Controllers
             string account = _configuration.GetValue<string>("CosmosDb:SimpleAccount");
 
             //Get the CosmosDb key from a KeyVault/
-            string key = await GetKeyFromKeyVault();
+            
+            var kv = new SecretClient(new Uri("https://completecloudguruvault.vault.azure.net/"), new DefaultAzureCredential());
+            var secret = await kv.GetSecretAsync("CosmosDbConnectionKey");
+            string key = secret.Value.Value;
+
 
 
             Microsoft.Azure.Cosmos.CosmosClient client = new Microsoft.Azure.Cosmos.CosmosClient(account, key);
@@ -155,7 +163,7 @@ namespace SecurityInDepthDemo.Controllers
 
         public async Task<IActionResult> ManagedIdentityConnection()
         {
-            ViewBag.Message = "Got some data but get the key from the key vault.";
+            ViewBag.Message = "Got some data using a managed identity.";
 
             try
             {
