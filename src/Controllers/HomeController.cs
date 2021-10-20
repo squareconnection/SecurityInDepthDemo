@@ -33,12 +33,6 @@ namespace SecurityInDepthDemo.Controllers
             _configuration = configuration;
         }
 
-        private async Task<string> GetKeyFromKeyVault() {
-                var kv = new SecretClient(new Uri("https://completecloudguruvault.vault.azure.net/"), new DefaultAzureCredential());
-                var secret = await kv.GetSecretAsync("CosmosDbConnectionKey");
-                return secret.Value.Value;
-        }
-
         private async Task<ICosmosDbService> GetCosmosDbServiceWithStaticInfo() {
             
             string account = _configuration.GetValue<string>("CosmosDb:SimpleAccount");
@@ -70,10 +64,11 @@ namespace SecurityInDepthDemo.Controllers
         {
 
             string account = _configuration.GetValue<string>("CosmosDb:SimpleAccount");
+            string keyVaultUri = _configuration.GetValue<string>("KeyVaultUri");
 
             //Get the CosmosDb key from a KeyVault/
-            
-            var kv = new SecretClient(new Uri("https://completecloudguruvault.vault.azure.net/"), new DefaultAzureCredential());
+
+            var kv = new SecretClient(new Uri(keyVaultUri), new DefaultAzureCredential());
             var secret = await kv.GetSecretAsync("CosmosDbConnectionKey");
             string key = secret.Value.Value;
 
